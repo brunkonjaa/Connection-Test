@@ -68,6 +68,7 @@ class OpenAiOAuth(private val context: Context, private val http: OkHttpClient =
             while (input.readLine()?.isNotEmpty() == true) Unit
             val target = requestLine.split(' ').getOrNull(1) ?: error("Invalid sign-in callback.")
             val callback = Uri.parse("http://127.0.0.1$target")
+            require(callback.queryParameterNames.all { callback.getQueryParameters(it).size == 1 }) { "The sign-in callback contained duplicate parameters." }
             val query = callback.queryParameterNames.associateWith { callback.getQueryParameter(it).orEmpty() }
             val body = if (query["state"] == state) "You can return to Ask Buster." else "Sign-in could not be verified. Return to Ask Buster."
             val html = "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nConnection: close\r\nContent-Length: ${body.toByteArray().size}\r\n\r\n$body"
@@ -128,7 +129,9 @@ class OpenAiOAuth(private val context: Context, private val http: OkHttpClient =
         }
         require(jwt.verify(verifier)) { "ChatGPT sign-in could not be verified." }
         val c = jwt.jwtClaimsSet
-        require(c.issuer == authHost && clientId in c.audience && c.expirationTime.after(java.util.Date()) && c.getStringClaim("nonce") == nonce)
+        val now = System.currentTimeMillis()
+        require(c.issuer == authHost && clientId in c.audience && c.expirationTime.after(java.util.Date(now - 5_000)) &&
+            c.issueTime != null && c.subject.isNotBlank() && c.getStringClaim("nonce") == nonce)
         return JSONObject().put("sub", c.subject).put("email", c.getStringClaim("email") ?: "")
     }
 

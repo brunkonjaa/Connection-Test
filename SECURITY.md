@@ -15,5 +15,5 @@
 
 - OpenAI's official docs do not confirm Android as a platform or provide a native SDK/reference client. Treat native callback behavior and OAuth policy acceptance as unverified until real-device testing.
 - Token revocation is not implemented; local credentials are erased on disconnect, and access can be withdrawn through ChatGPT settings.
-- Automated dependency vulnerability scanning is not configured. Dependencies are version-pinned and should be reviewed before release.
+- Pull requests run GitHub's dependency review and fail for high-severity dependency alerts; Dependabot checks Gradle and workflow dependencies weekly. This does not replace a full release-time security assessment.
 - A debug APK is suitable for private testing only. Production distribution requires a separate signing and release process.

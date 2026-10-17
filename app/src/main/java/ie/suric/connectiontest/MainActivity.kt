@@ -65,27 +65,32 @@ class ConnectionViewModel(private val app: android.app.Application) : ViewModel(
     private var autoQuestionSent = false
     private var signInJob: Job? = null
 
+    private fun transitionAuth(event: AuthStateMachine.Event) {
+        _auth.value = AuthStateMachine.transition(_auth.value, event)
+    }
+
     init {
         if (tokens != null) {
+            autoQuestionSent = true
             _auth.value = AuthState.SignedIn(tokens?.email)
-            sendInitialQuestion()
         }
     }
 
     fun signIn() {
         if (_auth.value == AuthState.SigningIn) return
-        _auth.value = AuthState.SigningIn
+        transitionAuth(AuthStateMachine.Event.Begin)
         signInJob = viewModelScope.launch {
             try {
                 val result = oauth.signIn(tokens)
                 tokens = result; vault.save(result)
-                _auth.value = AuthState.SignedIn(result.email)
+                transitionAuth(AuthStateMachine.Event.Success(result.email))
                 loadModelAndInitialQuestion()
             } catch (_: kotlinx.coroutines.CancellationException) {
-        _auth.value = AuthState.SignedOut
+                transitionAuth(AuthStateMachine.Event.Cancel)
             } catch (e: Exception) {
                 val message = e.message ?: "Sign-in failed. Please try again."
-                _auth.value = if (message.contains("cancelled", true)) AuthState.SignedOut else AuthState.Failed(message)
+                if (message.contains("cancelled", true)) transitionAuth(AuthStateMachine.Event.Cancel)
+                else transitionAuth(AuthStateMachine.Event.Error(message))
             }
         }
     }
@@ -94,12 +99,12 @@ class ConnectionViewModel(private val app: android.app.Application) : ViewModel(
         oauth.cancel()
         signInJob?.cancel()
         signInJob = null
-        _auth.value = AuthState.SignedOut
+        transitionAuth(AuthStateMachine.Event.Cancel)
     }
 
     fun disconnect() {
         tokens = null; model = null; vault.clear(); autoQuestionSent = true
-        _auth.value = AuthState.SignedOut; _conversation.value = ConversationState()
+        transitionAuth(AuthStateMachine.Event.Disconnect); _conversation.value = ConversationState()
     }
 
     fun updateDraft(value: String) { _conversation.value = _conversation.value.copy(draft = value) }
@@ -123,7 +128,7 @@ class ConnectionViewModel(private val app: android.app.Application) : ViewModel(
                 _conversation.value = ConversationReducer.completed(_conversation.value)
             } catch (e: Exception) {
                 if (e is ApiException && e.statusCode == 401) {
-                    _auth.value = AuthState.Failed("Your ChatGPT sign-in expired. Reconnect and retry your question.")
+                    transitionAuth(AuthStateMachine.Event.Expired)
                 } else _conversation.value = ConversationReducer.failed(_conversation.value, e.message ?: "The request failed. Try again.")
             }
         }
