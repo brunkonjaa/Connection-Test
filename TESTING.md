@@ -12,15 +12,24 @@ Unit tests cover authentication UI state transitions, cancellation/expiry messag
 
 GitHub Actions runs all three commands and publishes the debug APK artifact. CI uses no user or ChatGPT credentials.
 
-## Real-device test checklist (not yet completed)
+## Real-device verification
 
-1. Install the CI debug APK on an Android 13 device (Samsung A12, if available) with a browser signed in to the intended ChatGPT Plus account.
-2. Tap **Continue with ChatGPT** and verify the system browser opens; approve the named app and plan-use permission.
-3. Return to the app. Verify it shows a connected account and submits the rosemary question automatically.
-4. Confirm a streamed, non-empty answer appears from a live Responses API request, not from local canned content.
-5. Close and relaunch the app. Confirm valid tokens restore the connection and a question can be submitted.
-6. Select **Disconnect**, verify credentials are cleared, then reconnect.
-7. If text succeeds, select a photo and verify image input on an account-listed model that supports it.
-8. Exercise browser cancellation, revoked access/token expiry, airplane mode, a failed request and retry. Confirm errors are actionable and no credentials appear in logs.
+On 17 October 2026, the user supplied screenshots from a physical Android device showing:
 
-No physical-device checks are claimed by this setup. Record device model, Android version, build SHA, action and observed result before marking an item complete.
+- OpenAI's authorization notice for Ask Buster and permission to use ChatGPT plan limits.
+- Return to Ask Buster through its local `127.0.0.1` callback page.
+- The app in a connected state and a response to the initial rosemary question, labelled `GPT-6.1-Sol`.
+- A second in-app response to a fig-tree follow-up question.
+
+This is evidence of a real authenticated text conversation in the native app. The screenshots do not identify device model, Android version, or build SHA. Do not infer those details from the screenshots. The CI run for commit `6771f1d7ae0af14345f93cbed3efcb024691e984` passed tests, lint and APK build, but CI itself does not establish account authentication or plan usage.
+
+### Still to test on-device
+
+1. Record device model, Android version and installed APK build SHA.
+2. Close and relaunch the app; confirm the encrypted session restores and a question can be submitted.
+3. Disconnect and reconnect; confirm credentials are removed on disconnect.
+4. Exercise browser cancellation, revoked access/token expiry, airplane mode, failed request and retry; confirm errors are understandable and no credentials appear in logs.
+5. Test photo input with an account-listed model that supports images.
+6. If required, observe incremental response deltas on-device; screenshots prove a completed answer appeared, not that the UI visibly updated during streaming.
+
+The screenshots show literal Markdown markers such as `**bold**` in response text. Track Markdown rendering as a UI follow-up; it does not invalidate the authenticated inference result.

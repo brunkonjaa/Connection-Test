@@ -13,15 +13,19 @@ Research checked against OpenAI's official documentation on 17 October 2026.
 | OAuth mechanisms? | System browser; fresh state, OIDC nonce and PKCE S256 per attempt; HTTP loopback `127.0.0.1` with exact callback URI (scheme/host/path fixed; port may vary); code exchange with PKCE verifier; verify ID-token signature, issuer, client audience, expiry and nonce; require `chatgpt.tokens.use.direct`. |
 | Can it call Responses API? | Yes. The official flow directs an OAuth bearer token to `POST https://api.openai.com/v1/responses`. Requests must set `stream=true` and `store=false`, with conversation context in `input`. Private `backend-api` endpoints are explicitly not supported. |
 | Which models are eligible? | Do not hardcode names. Fetch `GET /v1/models` with the selected account's OAuth token; display models with `visibility=list` and send the selected `slug`. Eligibility depends on the account catalog and workspace policy. The docs identify Plus/Pro plan eligibility, not a fixed model allowlist. |
-| Image input? | Preview limitations say text, images and files are supported when the selected model accepts them. Audio/video and Files upload/transcription APIs are unsupported. This app's optional photo input is not yet verified with a live account/device. |
+| Image input? | Preview limitations say text, images and files are supported when the selected model accepts them. Audio/video and Files upload/transcription APIs are unsupported. This app's optional photo input has not yet been verified with a live account/device. |
 | Can this be standalone? | The OSS flow is for open-source and locally hosted apps and uses OAuth tokens directly with the public Responses endpoint. It does not require a custom backend, client secret, partner API key, or separately billed API key. Android-specific callback operation remains unverified. |
 | Official Android SDK/reference? | None found in the official SIWC quickstart and OSS sign-in/inference docs reviewed. The protocol is documented generically; this repository implements it directly with Android platform APIs and standard libraries. |
 
 ## Current result
 
-**Potentially supported but unverified.** The Android project implements the documented public-client pattern without an API key. CI and physical-device validation remain outstanding until the workflow runs and an Android device completes OAuth plus genuine inference. A successful build or mocked test is not proof of subscription usage.
+**Supported and verified for text authentication and inference (17 October 2026).** The user supplied Android screenshots showing the OpenAI authorization notice granting Ask Buster permission to use ChatGPT plan limits, the return to the app's loopback callback, an authenticated account in Ask Buster, and two responses displayed in the app. The app labelled the selected account-listed model `GPT-6.1-Sol`; the second response followed a separate fig-tree question. The screenshot evidence is consistent with the documented OAuth and Responses API path implemented here. No API key or custom backend is part of that path.
 
-No static OAuth credentials or pre-registration approval are identified as blockers: this OSS path dynamically registers during user authorization. OpenAI still must accept the client registration and grant the requested plan-use scope to the user's account/workspace.
+The screenshots do not show the device model, Android version, or app build SHA, so those are not asserted. Photo input, app-restart session recovery, disconnect/reconnect, cancellation/expiry behavior on-device, and incremental streaming behavior remain unverified. A visible presentation defect is that Markdown markers such as `**bold**` appear literally in answers.
+
+The CI run for commit `6771f1d7ae0af14345f93cbed3efcb024691e984` passed unit tests, Android lint, debug APK assembly, and artifact upload: [workflow run 38993099752](https://github.com/brunkonjaa/Connection-Test/actions/runs/38993099752). CI is not the evidence for real ChatGPT use; the user-supplied device screenshots are.
+
+No static OAuth credentials or pre-registration approval were required in this observed flow: OpenAI dynamically registered the client during user authorization and the user granted plan-use access. This result verifies the tested account and flow; it does not guarantee eligibility for every account or workspace policy.
 
 ## Official evidence
 
