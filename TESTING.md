@@ -20,8 +20,9 @@ On 17 October 2026, the user supplied screenshots from a physical Android device
 - Return to Ask Buster through its local `127.0.0.1` callback page.
 - The app in a connected state and a response to the initial rosemary question, labelled `GPT-6.1-Sol`.
 - A second in-app response to a fig-tree follow-up question.
+- The user additionally confirmed successful image upload and visual analysis in the app.
 
-This is evidence of a real authenticated text conversation in the native app. The screenshots do not identify device model, Android version, or build SHA. Do not infer those details from the screenshots. The CI run for commit `6771f1d7ae0af14345f93cbed3efcb024691e984` passed tests, lint and APK build, but CI itself does not establish account authentication or plan usage.
+This is user-reported physical-device verification of an authenticated native conversation with multi-turn context and image analysis using ChatGPT plan usage. The screenshots and confirmation do not identify device model, Android version, or build SHA. Do not infer those details. The CI run for commit `6771f1d7ae0af14345f93cbed3efcb024691e984` passed tests, lint and APK build, but CI itself does not establish account authentication or plan usage.
 
 ### Still to test on-device
 
@@ -29,7 +30,6 @@ This is evidence of a real authenticated text conversation in the native app. Th
 2. Close and relaunch the app; confirm the encrypted session restores and a question can be submitted.
 3. Disconnect and reconnect; confirm credentials are removed on disconnect.
 4. Exercise browser cancellation, revoked access/token expiry, airplane mode, failed request and retry; confirm errors are understandable and no credentials appear in logs.
-5. Test photo input with an account-listed model that supports images.
-6. If required, observe incremental response deltas on-device; screenshots prove a completed answer appeared, not that the UI visibly updated during streaming.
+5. If required, observe incremental response deltas on-device; screenshots prove completed answers appeared, not that the UI visibly updated during streaming.
 
 The screenshots show literal Markdown markers such as `**bold**` in response text. Track Markdown rendering as a UI follow-up; it does not invalidate the authenticated inference result.
