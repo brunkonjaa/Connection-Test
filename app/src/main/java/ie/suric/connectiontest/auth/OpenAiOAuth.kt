@@ -111,7 +111,7 @@ class OpenAiOAuth(private val context: Context, private val http: OkHttpClient =
         require("chatgpt.tokens.use.direct" in scopes) { "ChatGPT plan usage was not authorised for this app." }
         val idToken = json.getString("id_token")
         val claims = validateIdToken(idToken, clientId, nonce)
-        Tokens(clientId, json.getString("access_token"), json.getString("refresh_token"), idToken,
+        return Tokens(clientId, json.getString("access_token"), json.getString("refresh_token"), idToken,
             claims.getString("sub"), claims.optString("email").takeIf(String::isNotBlank), scopes,
             System.currentTimeMillis()/1000 + json.getLong("expires_in"))
     }
