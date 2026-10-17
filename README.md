@@ -2,6 +2,8 @@
 
 A minimal Android proof of concept testing the official **Sign in with ChatGPT** open-source flow and native Responses API conversation. It asks the rosemary question after sign-in and displays the streamed response. It does not use an OpenAI API key or a separate API billing account.
 
+Licensed under AGPL-3.0; see [LICENSE](LICENSE).
+
 ## Current status
 
 This client implements the documented OAuth + PKCE loopback flow, encrypted local token storage, account-specific model discovery, streamed text inference, and optional photo input. **A real ChatGPT Plus sign-in and response have not yet been verified on a physical Android device.** See [FEASIBILITY.md](FEASIBILITY.md) for platform caveats and what remains.

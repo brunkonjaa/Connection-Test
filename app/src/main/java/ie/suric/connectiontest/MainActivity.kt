@@ -222,7 +222,7 @@ private fun ConnectionScreen(state: AuthState, vm: ConnectionViewModel) {
         Spacer(Modifier.height(12.dp))
         Text("Uses eligible ChatGPT plan access if OpenAI grants it. This app does not use an API key.", style = MaterialTheme.typography.bodySmall)
         TextButton(onClick = { context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, Uri.parse("https://www.gnu.org/licenses/agpl-3.0.html"))) }) {
-            Text("Open source • AGPL-3.0 • No warranty", style = MaterialTheme.typography.labelSmall)
+            Text("© 2026 Ask Buster • AGPL-3.0 • No warranty", style = MaterialTheme.typography.labelSmall)
         }
     }
 }
@@ -230,6 +230,7 @@ private fun ConnectionScreen(state: AuthState, vm: ConnectionViewModel) {
 @Composable
 private fun ConversationScreen(email: String?, vm: ConnectionViewModel) {
     val state by vm.conversation.collectAsState()
+    val context = LocalContext.current
     var selectedImage by remember { mutableStateOf<Uri?>(null) }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { selectedImage = it }
     Column(Modifier.fillMaxSize().imePadding()) {
@@ -255,5 +256,9 @@ private fun ConversationScreen(email: String?, vm: ConnectionViewModel) {
             IconButton(onClick = { vm.send(image = selectedImage); selectedImage = null }, enabled = !state.isLoading, modifier = Modifier.size(52.dp)) { Icon(Icons.AutoMirrored.Filled.Send, "Send") }
         }
         selectedImage?.let { Text("Photo attached", Modifier.padding(start = 16.dp, bottom = 8.dp)) }
+        TextButton(onClick = { context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, Uri.parse("https://www.gnu.org/licenses/agpl-3.0.html"))) },
+            modifier = Modifier.align(Alignment.CenterHorizontally)) {
+            Text("© 2026 Ask Buster • AGPL-3.0 • No warranty", style = MaterialTheme.typography.labelSmall)
+        }
     }
 }
